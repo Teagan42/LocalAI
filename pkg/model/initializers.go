@@ -65,6 +65,12 @@ func backendPath(assetDir, backend string) string {
 	return filepath.Join(assetDir, "backend-assets", "grpc", backend)
 }
 
+func caseInsensitiveContains(str, substr string) bool {
+	str = strings.ToLower(str)
+	substr = strings.ToLower(substr)
+	return strings.Contains(str, substr)
+}
+
 // backendsInAssetDir returns the list of backends in the asset directory
 // that should be loaded
 func backendsInAssetDir(assetDir string) ([]string, error) {
@@ -205,7 +211,7 @@ func selectGRPCProcess(backend, assetDir string, f16 bool) string {
 	gpus, err := xsysinfo.GPUs()
 	if err == nil {
 		for _, gpu := range gpus {
-			if strings.Contains(gpu.String(), "nvidia") {
+			if caseInsensitiveContains(gpu.String(), "nvidia") {
 				p := backendPath(assetDir, LLamaCPPCUDA)
 				if _, err := os.Stat(p); err == nil {
 					log.Info().Msgf("[%s] attempting to load with CUDA variant", backend)
